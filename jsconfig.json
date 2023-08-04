@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    }
+  }
+}
+// tự động gợi ý file và command click  vào thư mục ngẫu nhiên nó sẽ chuyển đến
