@@ -8,13 +8,36 @@ import CardActions from "@mui/material/CardActions";
 import AttachmentIcon from "@mui/icons-material/Attachment";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+// dnd kit
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 function Card({ card }) {
+  // dnd kit
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: card._id, data: { ...card } });
+
+  const dndkitCardStyles = {
+    // touchAction: "none",//dành cho sensor default dạng poiter sensor
+    transition,
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.5 : undefined,
+  };
   const showCardAction = () =>
     !!card?.memberIds?.length ||
     !!card?.comments?.length ||
     !!card?.attachments?.length;
   return (
     <MuiCard
+      ref={setNodeRef}
+      style={dndkitCardStyles}
+      {...attributes}
+      {...listeners}
       sx={{
         boxShadow: "0 1px 1px rgba(0,0,0,0.2)",
         width: "100%",

@@ -3,7 +3,6 @@ import Column from "./Column/Column";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button/";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
-import theme from "~/Theme";
 import {
   SortableContext,
   horizontalListSortingStrategy,

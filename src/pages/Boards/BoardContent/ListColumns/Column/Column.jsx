@@ -23,13 +23,21 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 function Column({ column }) {
   // dnd kit
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: column._id, data: { ...column } });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column._id, data: { ...column } });
 
   const dndkitColumnStyles = {
     // touchAction: "none",//dành cho sensor default dạng poiter sensor
-    transform: CSS.Translate.toString(transform),
     transition,
+    height: "100%",
+    opacity: isDragging ? 0.5 : undefined,
+    transform: CSS.Translate.toString(transform),
   };
   // menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -43,142 +51,143 @@ function Column({ column }) {
   // ordercard
   const oderedCards = MapOrder(column?.cards, column?.cardOrderIds, "_id");
   return (
-    <Box
-      ref={setNodeRef}
-      style={dndkitColumnStyles}
-      {...attributes}
-      {...listeners}
-      sx={{
-        ml: 2,
-        minWidth: "250px",
-        maxWidth: "300px",
-        borderRadius: "6px",
-        height: "fit-content",
-        maxHeight: (theme) =>
-          `calc(${theme._boardcontentHeight} - ${theme.spacing(5)})`,
-        bgcolor: (theme) =>
-          theme.palette.mode === "dark" ? "#333643" : "#ebecf0",
-      }}
-    >
-      {/* <ListCard /> */}
-      {/* HEADER_CARD */}
+    // thêm thẻ div fix lỗi drag column(giựt giựt)
+    <div ref={setNodeRef} style={dndkitColumnStyles} {...attributes}>
       <Box
+        // event viết ở đây để fix lỗi chiều cao column : lỗi vẫn kéo đc khi ko trỏ vào column
+        {...listeners}
         sx={{
-          p: 2,
-          display: "flex",
-          alignItems: "center",
-          height: (theme) => theme._headerColumnHeight,
-          justifyContent: "space-between",
+          ml: 2,
+          minWidth: "250px",
+          maxWidth: "300px",
+          borderRadius: "6px",
+          height: "fit-content",
+          maxHeight: (theme) =>
+            `calc(${theme._boardcontentHeight} - ${theme.spacing(5)})`,
+          bgcolor: (theme) =>
+            theme.palette.mode === "dark" ? "#333643" : "#ebecf0",
         }}
       >
-        <Typography
-          variant="h6"
+        {/* <ListCard /> */}
+        {/* HEADER_CARD */}
+        <Box
           sx={{
-            fontSize: "0.9rem",
-            fontWeight: "bold",
-            cursor: "pointer",
+            p: 2,
+            display: "flex",
+            alignItems: "center",
+            height: (theme) => theme._headerColumnHeight,
+            justifyContent: "space-between",
           }}
         >
-          {column.title}
-        </Typography>
-        <Box>
-          <Tooltip title="more">
-            <ExpandMoreIcon
-              aria-haspopup="true"
-              onClick={handleClick}
-              id="basic-column-dropdown"
-              sx={{ cursor: "pointer", color: "text.primary" }}
-              aria-expanded={open ? "true" : undefined}
-              aria-controls={open ? "basic-menu-column-dropdown" : undefined}
-            />
-          </Tooltip>
-          <Menu
-            id="basic-menu-workspace"
-            aria-labelledby="basic-button-workspaces"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
+          <Typography
+            variant="h6"
+            sx={{
+              fontSize: "0.9rem",
+              fontWeight: "bold",
+              cursor: "pointer",
             }}
           >
-            <MenuItem>
-              <ListItemIcon>
-                <AddCardIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Add new card</ListItemText>
-              <Typography variant="body2" color="text.secondary">
-                ⌘X
-              </Typography>
-            </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <ContentCut fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Cut</ListItemText>
-              <Typography variant="body2" color="text.secondary">
-                ⌘X
-              </Typography>
-            </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <ContentCopy fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Copy</ListItemText>
-              <Typography variant="body2" color="text.secondary">
-                ⌘C
-              </Typography>
-            </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <ContentPaste fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Paste</ListItemText>
-              <Typography variant="body2" color="text.secondary">
-                ⌘V
-              </Typography>
-            </MenuItem>
-            <Divider />
-            <MenuItem>
-              <ListItemIcon>
-                <DeleteForeverIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Remove this column</ListItemText>
-            </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <Cloud fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Archive this column</ListItemText>
-            </MenuItem>
-          </Menu>
+            {column.title}
+          </Typography>
+          <Box>
+            <Tooltip title="more">
+              <ExpandMoreIcon
+                aria-haspopup="true"
+                onClick={handleClick}
+                id="basic-column-dropdown"
+                sx={{ cursor: "pointer", color: "text.primary" }}
+                aria-expanded={open ? "true" : undefined}
+                aria-controls={open ? "basic-menu-column-dropdown" : undefined}
+              />
+            </Tooltip>
+            <Menu
+              id="basic-menu-workspace"
+              aria-labelledby="basic-button-workspaces"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <MenuItem>
+                <ListItemIcon>
+                  <AddCardIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Add new card</ListItemText>
+                <Typography variant="body2" color="text.secondary">
+                  ⌘X
+                </Typography>
+              </MenuItem>
+              <MenuItem>
+                <ListItemIcon>
+                  <ContentCut fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Cut</ListItemText>
+                <Typography variant="body2" color="text.secondary">
+                  ⌘X
+                </Typography>
+              </MenuItem>
+              <MenuItem>
+                <ListItemIcon>
+                  <ContentCopy fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Copy</ListItemText>
+                <Typography variant="body2" color="text.secondary">
+                  ⌘C
+                </Typography>
+              </MenuItem>
+              <MenuItem>
+                <ListItemIcon>
+                  <ContentPaste fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Paste</ListItemText>
+                <Typography variant="body2" color="text.secondary">
+                  ⌘V
+                </Typography>
+              </MenuItem>
+              <Divider />
+              <MenuItem>
+                <ListItemIcon>
+                  <DeleteForeverIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Remove this column</ListItemText>
+              </MenuItem>
+              <MenuItem>
+                <ListItemIcon>
+                  <Cloud fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Archive this column</ListItemText>
+              </MenuItem>
+            </Menu>
+          </Box>
+        </Box>
+        {/* LIST_CARD */}
+        <ListCard cards={oderedCards} />
+        {/* FOOTER_CARD */}
+        <Box
+          sx={{
+            p: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: (theme) => theme._footerColumnHeight,
+          }}
+        >
+          <Button sx={{ color: "text.primary" }} startIcon={<AddCardIcon />}>
+            Add new card
+          </Button>
+          <Tooltip title="Drag item">
+            <DragHandleIcon />
+          </Tooltip>
         </Box>
       </Box>
-      {/* LIST_CARD */}
-      <ListCard cards={oderedCards} />
-      {/* FOOTER_CARD */}
-      <Box
-        sx={{
-          p: 2,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          height: (theme) => theme._footerColumnHeight,
-        }}
-      >
-        <Button sx={{ color: "text.primary" }} startIcon={<AddCardIcon />}>
-          Add new card
-        </Button>
-        <Tooltip title="Drag item">
-          <DragHandleIcon />
-        </Tooltip>
-      </Box>
-    </Box>
+    </div>
   );
 }
 
